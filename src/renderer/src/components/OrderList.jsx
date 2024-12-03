@@ -40,6 +40,25 @@ export default function OrderList({ btnmessage, btnColor = 'primary' }) {
     setBoxes(boxes.filter((box) => box.id !== id))
   }
 
+  async function handleOrderCardClick(orderNum) {
+    const fromDevice = 'orderTermination';
+    const toDevice = 'display'; // Single toDevice value
+  
+    try {
+      const response = await fetch('/write', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fromDevice: fromDevice, toDevice: toDevice, orderNum: parseInt(orderNum) })
+      });
+      const data = await response.text();
+      console.log(data);
+    } catch (error) {
+      console.error('Error writing data:', error);
+    }
+  }  
+
   return (
     <div className="OrderList">
       {boxes.map((box) => (
@@ -50,8 +69,9 @@ export default function OrderList({ btnmessage, btnColor = 'primary' }) {
           id={box.id}
           btnColor={box.btnColor}
           removeOrderCard={removeOrderCard}
+          onOrderCardClick={handleOrderCardClick} // Pass the handler function
         />
       ))}
     </div>
-  )
+  );
 }
