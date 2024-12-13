@@ -4,14 +4,22 @@ import { v4 as uuid } from 'uuid'
 import { useState, useEffect } from 'react'
 
 export default function OrderList({ btnmessage, btnColor = 'primary' }) {
-  const [boxes, setBoxes] = useState([])
+  const [boxes, setBoxes] = useState(() => {
+    const savedBoxes = localStorage.getItem('orderBoxes');
+    return savedBoxes ? JSON.parse(savedBoxes) : [];
+  })
+
+  // Save to localStorage whenever boxes changes
+  useEffect(() => {
+    localStorage.setItem('orderBoxes', JSON.stringify(boxes));
+  }, [boxes]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await fetch('/api')
         const orders = await response.json()
-        
+
         // Only process orders if array is not empty
         if (orders && orders.length > 0) {
           orders.forEach(order => {
@@ -28,10 +36,10 @@ export default function OrderList({ btnmessage, btnColor = 'primary' }) {
   }, [])
 
   function addOrderCard(orderNum) {
-    const newBox = { 
-      id: uuid(), 
+    const newBox = {
+      id: uuid(),
       btnColor,
-      orderNum 
+      orderNum
     }
     setBoxes(prevBoxes => [...prevBoxes, newBox])
   }
@@ -43,7 +51,7 @@ export default function OrderList({ btnmessage, btnColor = 'primary' }) {
   async function handleOrderCardClick(orderNum) {
     const fromDevice = 'orderTermination';
     const toDevice = 'display'; // Single toDevice value
-  
+
     try {
       const response = await fetch('/write', {
         method: 'POST',
@@ -57,7 +65,7 @@ export default function OrderList({ btnmessage, btnColor = 'primary' }) {
     } catch (error) {
       console.error('Error writing data:', error);
     }
-  }  
+  }
 
   return (
     <div className="OrderList">
