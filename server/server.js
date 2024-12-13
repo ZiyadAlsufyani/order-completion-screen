@@ -10,14 +10,14 @@ app.use(bodyParser.json());
 const data = []; // Moved outside the function to ensure it is accessible
 
 const run = async () => {
-  const connector = new rti.Connector('MyParticipantLibrary::MySubParticipant', configFile);
+  const connector = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::MySubParticipant', configFile);
   const input = connector.getInput('MySubscriber::MySquareReader');
   try {
     console.log('Waiting for publications...');
     await input.waitForPublications();
 
     console.log('Waiting for data...');
-    for (let i = 0; i < 500; i++) {
+    while (true)   {
       await input.wait();
       input.take();
       console.log('Samples received: ' + input.samples.getLength());
@@ -48,7 +48,7 @@ app.post('/write', async (req, res) => {
   const { fromDevice, toDevice, orderNum } = req.body;
   console.log(req.body);
 
-  const connector = new rti.Connector('MyParticipantLibrary::MyPubParticipant', configFile);
+  const connector = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::MyPubParticipant', configFile);
   const output = connector.getOutput('MyPublisher::MySquareWriter');
 
   try {
