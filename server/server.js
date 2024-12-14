@@ -9,12 +9,12 @@ app.use(bodyParser.json());
 
 const data = []; // Moved outside the function to ensure it is accessible
 
-const connector2 = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::MyPubParticipant', configFile);
-const output2 = connector2.getOutput('MyPublisher::MySquareWriter');
+const connector2 = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::OrderCompletionScreenPubParticipant', configFile);
+const output2 = connector2.getOutput('OrderCompletionScreenPublisher::OrderCompletionScreenWriter');
 
 const run = async () => {
-  const connector = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::MySubParticipant', configFile);
-  const input = connector.getInput('MySubscriber::MySquareReader');
+  const connector = new rti.Connector('OrderCompletionScreenDomainParticipantLibrary::OrderCompletionScreenSubParticipant', configFile);
+  const input = connector.getInput('OrderCompletionScreenSubscriber::OrderCompletionScreenReader');
   try {
     console.log('Waiting for publications...');
     await input.waitForPublications();
@@ -32,7 +32,6 @@ const run = async () => {
           toDevice: jsonData.toDevice,
           orderNum: jsonData.orderNum,
         });
-        
       }
     }
   } catch (err) {
@@ -51,10 +50,7 @@ app.post('/write', async (req, res) => {
   const { fromDevice, toDevice, orderNum } = req.body;
   console.log(req.body);
 
-
   try {
-
-
     console.log('Writing...');
     output2.instance.setString('fromDevice', fromDevice);
     output2.instance.setString('toDevice', toDevice);
@@ -69,13 +65,13 @@ app.post('/write', async (req, res) => {
 });
 process.on('SIGINT', () => {
   console.log('SIGINT signal received: closing connector');
-  connector.close();
+  connector2.close();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   console.log('SIGTERM signal received: closing connector');
-  connector.close();
+  connector2.close();
   process.exit(0);
 });
 
