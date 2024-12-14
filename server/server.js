@@ -55,6 +55,7 @@ app.post('/write', async (req, res) => {
     output2.instance.setString('fromDevice', fromDevice);
     output2.instance.setString('toDevice', toDevice);
     output2.instance.setNumber('orderNum', orderNum);
+    output2.instance.setString('orderDetails', null);
     output2.write();
 
     res.status(200).send('Data written successfully');
